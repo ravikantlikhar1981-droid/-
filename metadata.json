@@ -1,0 +1,6 @@
+{
+  "name": "Nav Yuvak Kosta Samaj",
+  "description": "नव युवक कोस्टा समाज समिति झांसी - संगठन प्रबंधन एवं डिजिटल पोर्टल",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
