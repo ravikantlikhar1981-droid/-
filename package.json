@@ -1,0 +1,14 @@
+{
+  "name": "nav-yuvak-kosta-samaj-jhansi",
+  "version": "1.0.0",
+  "description": "नव युवक कोस्टा समाज समिति झांसी - संगठन प्रबंधन एवं डिजिटल पोर्टल",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static build complete'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
