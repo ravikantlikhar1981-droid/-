@@ -44,7 +44,9 @@ class MainActivity : ComponentActivity() {
                                     builtInZoomControls = true
                                     displayZoomControls = false
                                     mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                                    cacheMode = WebSettings.LOAD_NO_CACHE
                                 }
+                                clearCache(true)
                                 loadUrl("file:///android_asset/index.html")
                             }
                         }
