@@ -755,6 +755,21 @@
                         <span id="pm-mem-status-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">चालू</span>
                     </button>
 
+                    <!-- Master Admin Only: Dynamic Member S.N. Settings -->
+                    <button id="pm-btn-sn-settings" type="button" onclick="openSnSettingsModal()"
+                        class="hidden w-full px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-indigo-900 flex items-center justify-between gap-2 text-left transition">
+                        <span class="flex items-center gap-2.5">
+                            <svg class="w-4 h-4 text-[#1E3A8A] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="4" y1="9" x2="20" y2="9"></line>
+                                <line x1="4" y1="15" x2="20" y2="15"></line>
+                                <line x1="10" y1="3" x2="8" y2="21"></line>
+                                <line x1="16" y1="3" x2="14" y2="21"></line>
+                            </svg>
+                            <span>सदस्य S.N. सेटिंग</span>
+                        </span>
+                        <span id="pm-sn-summary-badge" class="px-2 py-0.5 rounded-full bg-indigo-100 text-[#1E3A8A] text-[10px] font-mono font-extrabold">189</span>
+                    </button>
+
                     <!-- Password Reset / Change -->
                     <button type="button" onclick="closeProfileMenu(); openChangePasswordModal(false)"
                         class="w-full px-3 py-2.5 rounded-xl hover:bg-indigo-50 text-slate-800 flex items-center gap-2.5 text-left transition">
@@ -1149,7 +1164,7 @@
                             </div>
                         </div>
 
-                        <input id="acc-search" type="text" oninput="renderAccounts()" placeholder="नाम, रसीद क्र., UTR या व्यय विवरण खोजें..."
+                        <input id="acc-search" type="text" oninput="renderAccounts()" placeholder="S.N., नाम, रसीद क्र., UTR या व्यय विवरण खोजें..."
                             class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm outline-none focus:border-[#1E3A8A]">
 
                         <div id="accounts-list" class="space-y-2.5"></div>
@@ -1327,12 +1342,25 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <input id="member-search" type="text" oninput="renderMembers()" placeholder="नाम, लॉगिन ID, मोबाइल या मोहल्ला खोजें..."
+                        <input id="member-search" type="text" oninput="renderMembers()" placeholder="S.N., नाम, लॉगिन ID, मोबाइल या मोहल्ला खोजें..."
                             class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-sm outline-none focus:border-[#1E3A8A]">
-                        <button id="btn-add-member" type="button" onclick="openModal('modal-member')"
+                        <button id="btn-add-member" type="button" onclick="openAddMemberModal()"
                             class="hidden px-3.5 py-2.5 rounded-xl brand-gradient text-white text-xs font-bold shadow-sm shrink-0">
                             + सदस्य जोड़ें
                         </button>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm">
+                        <span id="members-count-label" class="text-[11px] font-extrabold text-slate-600">कुल सदस्य: 0</span>
+                        <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
+                            <button id="member-sort-recent" type="button" onclick="setMemberSortMode('recent')"
+                                class="px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition brand-gradient text-white shadow-sm">
+                                नवीनतम
+                            </button>
+                            <button id="member-sort-sn" type="button" onclick="setMemberSortMode('sn')"
+                                class="px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition text-slate-600">
+                                S.N. क्रम (1→N)
+                            </button>
+                        </div>
                     </div>
                     <div id="members-list" class="space-y-2.5"></div>
                 </section>
@@ -1465,6 +1493,40 @@
 
                     <form id="form-signup" class="space-y-3">
                         <p class="text-xs font-extrabold text-slate-700">चरण 2: आवेदन एवं भुगतान विवरण भरें</p>
+
+                        <!-- Dynamic Membership Type & S.N. Section (Hidden when Master Admin turns off Old Member option) -->
+                        <div id="signup-sn-section" class="space-y-2.5 bg-indigo-50/70 border border-indigo-200 rounded-xl p-3">
+                            <p class="text-xs font-extrabold text-[#1E3A8A]">सदस्यता श्रेणी चुनें <span class="text-rose-500">*</span></p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label id="signup-type-old-card" class="cursor-pointer rounded-xl border-2 border-[#1E3A8A] bg-white p-2.5 flex items-start gap-2 transition">
+                                    <input type="radio" name="signup-member-type" id="signup-type-old" value="old" onchange="handleSignupMemberTypeChange()" class="mt-0.5 accent-[#1E3A8A]">
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-extrabold text-slate-900 leading-tight">पुराना सदस्य</p>
+                                        <p id="signup-old-range-label" class="text-[10.5px] font-bold text-[#1E3A8A] mt-0.5 leading-snug">S.N. 1 से 189 तक</p>
+                                    </div>
+                                </label>
+                                <label id="signup-type-new-card" class="cursor-pointer rounded-xl border-2 border-slate-200 bg-white p-2.5 flex items-start gap-2 transition">
+                                    <input type="radio" name="signup-member-type" id="signup-type-new" value="new" checked onchange="handleSignupMemberTypeChange()" class="mt-0.5 accent-[#1E3A8A]">
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-extrabold text-slate-900 leading-tight">नया सदस्य</p>
+                                        <p id="signup-new-range-label" class="text-[10.5px] font-bold text-emerald-700 mt-0.5 leading-snug">S.N. 190 से स्वतः</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Old Member S.N. Mandatory Input -->
+                            <div id="signup-old-sn-wrap" class="hidden space-y-1.5 pt-1">
+                                <label for="signup-sn" class="block text-xs font-bold text-slate-700">सदस्य क्रमांक (S.N.) <span class="text-rose-500">*</span></label>
+                                <input id="signup-sn" type="number" min="1" max="189" inputmode="numeric" oninput="checkSignupSnLive()" placeholder="1 से 189 के बीच अपना पुराना S.N. लिखें"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-mono font-extrabold text-[#1E3A8A] focus:border-[#1E3A8A] outline-none">
+                                <p id="signup-sn-warning" class="hidden text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2.5 py-1.5 leading-snug"></p>
+                            </div>
+
+                            <!-- New Member Auto S.N. Info -->
+                            <div id="signup-new-sn-info" class="text-[11px] text-emerald-900 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-2 leading-snug font-semibold">
+                                एडमिन द्वारा वेरीफाई होने पर स्वतः अगला नया S.N. (S.N. 190 से शुरू) अलॉट होगा।
+                            </div>
+                        </div>
 
                         <div>
                             <label for="signup-name" class="block text-xs font-bold text-slate-700 mb-1">पूरा नाम <span class="text-rose-500">*</span></label>
@@ -1886,6 +1948,83 @@
         </div>
     </div>
 
+    <!-- MODAL: MASTER ADMIN — DYNAMIC MEMBER S.N. SETTINGS -->
+    <div id="modal-sn-settings" class="hidden fixed inset-0 z-50 bg-slate-900/65 flex items-center justify-center p-4">
+        <div class="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-indigo-100 pb-2">
+                <div>
+                    <h3 class="text-base font-extrabold text-[#1E3A8A]">सदस्य S.N. सेटिंग</h3>
+                    <p class="text-[11px] text-slate-500">ऑफ़लाइन व नए सदस्यों का डायनेमिक क्रमांक नियंत्रण</p>
+                </div>
+                <button type="button" onclick="closeModal('modal-sn-settings')" class="text-slate-400 hover:text-slate-700 font-bold text-xl leading-none px-1">&times;</button>
+            </div>
+            <form id="form-sn-settings" class="space-y-3.5">
+                <div>
+                    <label for="sn-set-last-offline" class="block text-xs font-bold text-slate-700 mb-1">अंतिम ऑफ़लाइन S.N. संख्या <span class="text-rose-500">*</span></label>
+                    <input id="sn-set-last-offline" type="number" min="1" required inputmode="numeric" oninput="updateSnSettingsPreview()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-extrabold text-[#1E3A8A] outline-none focus:border-[#1E3A8A]">
+                    <p id="sn-set-preview-hint" class="text-[11px] text-indigo-800 bg-indigo-50 border border-indigo-100 rounded-lg px-2.5 py-1.5 mt-1.5 font-semibold leading-snug"></p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-xs font-extrabold text-slate-900">पुराना सदस्य (S.N.) विकल्प</p>
+                        <p class="text-[10.5px] text-slate-600 leading-snug mt-0.5">बंद करने पर फ़ॉर्म से पुराना/नया चुनाव और S.N. बॉक्स छिप जाएगा</p>
+                    </div>
+                    <button id="sn-set-allow-old-toggle" type="button" onclick="toggleAllowOldMemberSnInModal()"
+                        class="px-3.5 py-2 rounded-xl text-xs font-extrabold shrink-0 transition bg-emerald-600 text-white shadow-sm">
+                        चालू ✓
+                    </button>
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl brand-gradient text-white text-xs font-extrabold shadow-md">
+                        S.N. सेटिंग सेव करें
+                    </button>
+                    <button type="button" onclick="closeModal('modal-sn-settings')" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
+                        बंद करें
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN — EDIT / ASSIGN MEMBER S.N. ON EXISTING VERIFIED MEMBER -->
+    <div id="modal-edit-member-sn" class="hidden fixed inset-0 z-50 bg-slate-900/65 flex items-center justify-center p-4">
+        <div class="w-full max-w-[400px] bg-white rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-indigo-100 pb-2">
+                <div class="min-w-0">
+                    <h3 class="text-base font-extrabold text-[#1E3A8A]">सदस्य S.N. संपादित करें</h3>
+                    <p id="edit-mem-sn-subtitle" class="text-[11px] text-slate-500 truncate"></p>
+                </div>
+                <button type="button" onclick="closeModal('modal-edit-member-sn')" class="text-slate-400 hover:text-slate-700 font-bold text-xl leading-none px-1">&times;</button>
+            </div>
+            <form id="form-edit-member-sn" class="space-y-3">
+                <input type="hidden" id="edit-mem-sn-user-id">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <label for="edit-mem-sn-input" class="block text-xs font-bold text-slate-700">सदस्य क्रमांक (S.N.) <span class="text-rose-500">*</span></label>
+                        <button type="button" onclick="fillNextSnInEditModal()"
+                            class="text-[10.5px] font-extrabold text-[#1E3A8A] bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md">
+                            स्वतः अगला नया S.N. भरें
+                        </button>
+                    </div>
+                    <input id="edit-mem-sn-input" type="number" min="1" required inputmode="numeric" oninput="checkEditMemberSnLive()" placeholder="उदा. 45"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-extrabold text-[#1E3A8A] outline-none focus:border-[#1E3A8A]">
+                    <p id="edit-mem-sn-warning" class="hidden text-[11px] font-bold rounded-lg px-2.5 py-1.5 mt-1.5 leading-snug"></p>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl brand-gradient text-white text-xs font-extrabold shadow-md">
+                        S.N. सेव करें ✓
+                    </button>
+                    <button type="button" onclick="closeModal('modal-edit-member-sn')" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">
+                        रद्द करें
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: MASTER ADMIN — ADMIN MANAGEMENT (OPENED FROM PROFILE MENU) -->
     <div id="modal-admin-manager" class="hidden fixed inset-0 z-50 bg-slate-900/65 flex items-center justify-center p-3 overflow-y-auto">
         <div class="w-full max-w-[440px] max-h-[90vh] flex flex-col bg-white rounded-2xl p-4 shadow-2xl space-y-3 my-auto">
@@ -1980,6 +2119,15 @@
                     </div>
                     <button type="button" onclick="copyText(document.getElementById('cred-email-val').textContent, 'Gmail ID')"
                         class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-900 text-[11px] font-bold shrink-0">कॉपी</button>
+                </div>
+
+                <div id="cred-sn-row" class="hidden flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-amber-200">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500">सदस्य क्रमांक (S.N.)</p>
+                        <p id="cred-member-sn" class="text-base font-mono font-extrabold text-amber-800"></p>
+                    </div>
+                    <button type="button" onclick="copyText(document.getElementById('cred-member-sn').textContent, 'सदस्य क्रमांक (S.N.)')"
+                        class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-bold">कॉपी</button>
                 </div>
 
                 <div class="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-indigo-100">
@@ -2266,11 +2414,20 @@
                 <input type="hidden" id="tx-type" value="membership">
 
                 <!-- Person Name (सदस्य का नाम / धनराशि देने वाले का नाम — Hidden/Optional for Expense) -->
-                <div id="tx-person-wrapper">
-                    <label id="tx-person-label" for="tx-person" class="block text-xs font-bold text-slate-700 mb-1">सदस्य का नाम *</label>
-                    <input id="tx-person" type="text" list="members-name-datalist" required placeholder="उदा. श्री अनिल कुमार कोस्टा"
-                        class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-[#1E3A8A]">
-                    <datalist id="members-name-datalist"></datalist>
+                <div id="tx-person-wrapper" class="space-y-2.5">
+                    <div id="tx-sn-lookup-wrap" class="hidden bg-indigo-50/70 border border-indigo-200 rounded-xl p-2.5 space-y-1">
+                        <label for="tx-sn-lookup" class="block text-[11px] font-extrabold text-[#1E3A8A]">सदस्य S.N. से तुरंत खोजें व ऑटो-फ़िल करें (वैकल्पिक)</label>
+                        <input id="tx-sn-lookup" type="number" min="1" inputmode="numeric" oninput="handleTxSnLookup()"
+                            placeholder="S.N. नंबर डालें (उदा. 45) — नाम अपने-आप भर जाएगा"
+                            class="w-full px-3 py-2 rounded-lg border border-indigo-200 bg-white text-xs font-mono font-extrabold text-[#1E3A8A] outline-none focus:border-[#1E3A8A]">
+                        <p id="tx-sn-lookup-status" class="hidden text-[10.5px] font-bold leading-snug"></p>
+                    </div>
+                    <div>
+                        <label id="tx-person-label" for="tx-person" class="block text-xs font-bold text-slate-700 mb-1">सदस्य का नाम *</label>
+                        <input id="tx-person" type="text" list="members-name-datalist" required placeholder="उदा. श्री अनिल कुमार कोस्टा"
+                            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-[#1E3A8A]">
+                        <datalist id="members-name-datalist"></datalist>
+                    </div>
                 </div>
 
                 <!-- Purpose / Expense Head (किस मद में खर्च — Prominent & Required for Expense, Optional Note for Income) -->
@@ -2495,6 +2652,11 @@
         <div class="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-2xl space-y-4">
             <h3 class="text-base font-extrabold text-slate-900">नया सदस्य / पदाधिकारी जोड़ें</h3>
             <form id="form-member" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">सदस्य क्रमांक (S.N.) (वैकल्पिक — खाली छोड़ने पर स्वतः अगला S.N.)</label>
+                    <input id="mem-sn" type="number" min="1" inputmode="numeric" placeholder="उदा. 45 या खाली छोड़ें"
+                        class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-mono font-bold text-[#1E3A8A] outline-none">
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">पूरा नाम *</label>
                     <input id="mem-name" type="text" required placeholder="उदा. श्री संतोष कोस्टा"
@@ -2907,6 +3069,7 @@
             },
             matrimonyWindow: { isOpen: true },
             membershipWindow: { isOpen: true },
+            snConfig: { lastOfflineSn: 189, allowOldMemberSn: true },
             studentWindow: {
                 isOpen: true,
                 session: '2026-27',
@@ -3255,6 +3418,14 @@
                     if (!appData.paymentInfo) appData.paymentInfo = JSON.parse(JSON.stringify(DEFAULT_DATA.paymentInfo));
                     if (!appData.matrimonyWindow) appData.matrimonyWindow = { isOpen: true };
                     if (!appData.membershipWindow) appData.membershipWindow = { isOpen: true };
+                    if (!appData.snConfig || typeof appData.snConfig !== 'object') {
+                        appData.snConfig = { lastOfflineSn: 189, allowOldMemberSn: true };
+                    }
+                    const parsedOfflineSn = parseInt(appData.snConfig.lastOfflineSn, 10);
+                    appData.snConfig.lastOfflineSn = (Number.isInteger(parsedOfflineSn) && parsedOfflineSn >= 1) ? parsedOfflineSn : 189;
+                    if (typeof appData.snConfig.allowOldMemberSn !== 'boolean') {
+                        appData.snConfig.allowOldMemberSn = true;
+                    }
                     if (!appData.studentWindow) appData.studentWindow = JSON.parse(JSON.stringify(DEFAULT_DATA.studentWindow));
                     if (!appData.students) appData.students = JSON.parse(JSON.stringify(DEFAULT_DATA.students));
                     if (!appData.pendingMembers) appData.pendingMembers = [];
@@ -3477,8 +3648,11 @@
 
             const pending = appData.pendingMembers.find(p => p.mobile === mob);
             if (pending) {
+                const pendingSnText = pending.assignedSn
+                    ? `S.N. ${pending.assignedSn}`
+                    : (pending.memberType === 'old' && pending.requestedSn ? `S.N. ${pending.requestedSn}` : 'वेरीफिकेशन पर स्वतः नया S.N. अलॉट होगा');
                 resBox.className = 'text-xs rounded-lg p-2.5 border bg-amber-50 border-amber-300 text-amber-950 space-y-1';
-                resBox.innerHTML = `<p class="font-extrabold">⏳ आवेदन सत्यापन हेतु लंबित है</p><p class="text-[11px] leading-snug">एडमिन द्वारा शुल्क वेरीफाई होने के बाद आपकी लॉगिन ID व अस्थायी पासवर्ड सीधे आपके पंजीकृत WhatsApp/Gmail पर भेजे जाएंगे।</p>`;
+                resBox.innerHTML = `<p class="font-extrabold">⏳ आवेदन सत्यापन हेतु लंबित है</p><p class="text-[11px] font-bold text-[#1E3A8A]">आवेदक: ${escapeHtml(pending.name)} • ${escapeHtml(pendingSnText)}</p><p class="text-[11px] leading-snug">एडमिन द्वारा शुल्क वेरीफाई होने के बाद आपकी लॉगिन ID व अस्थायी पासवर्ड सीधे आपके पंजीकृत WhatsApp/Gmail पर भेजे जाएंगे।</p>`;
                 return;
             }
 
@@ -3487,6 +3661,7 @@
                 resBox.className = 'text-xs rounded-lg p-2.5 border bg-emerald-50 border-emerald-300 text-emerald-950 space-y-1';
                 resBox.innerHTML = `
                     <p class="font-extrabold text-emerald-800">सदस्यता सत्यापित हो चुकी है ✓</p>
+                    <p class="text-[11px] font-extrabold text-[#1E3A8A]">${escapeHtml(getUserDisplayName(approved))}</p>
                     <p class="text-[11px] text-slate-700 leading-snug">सुरक्षा हेतु लॉगिन ID व पासवर्ड यहाँ प्रदर्शित नहीं किए जाते। कृपया अपने पंजीकृत WhatsApp/Gmail संदेश की जाँच करें या समिति एडमिन से संपर्क करें।</p>
                 `;
                 return;
@@ -3531,9 +3706,20 @@
         function openCredentialsModal(user, titleText = 'सदस्यता वेरीफाई एवं ID जारी') {
             activeCredShare = user;
             document.getElementById('cred-modal-title').textContent = titleText;
-            document.getElementById('cred-member-name').textContent = `${user.name} (+91 ${user.mobile})`;
+            document.getElementById('cred-member-name').textContent = `${getUserDisplayName(user)} (+91 ${user.mobile})`;
             document.getElementById('cred-login-id').textContent = user.loginId;
             document.getElementById('cred-temp-pass').textContent = user.password;
+
+            const snRow = document.getElementById('cred-sn-row');
+            const snVal = document.getElementById('cred-member-sn');
+            if (snRow && snVal) {
+                if (user.sn) {
+                    snVal.textContent = `S.N. ${user.sn}`;
+                    snRow.classList.remove('hidden');
+                } else {
+                    snRow.classList.add('hidden');
+                }
+            }
 
             const emailRow = document.getElementById('cred-email-row');
             const gmailBtn = document.getElementById('btn-cred-send-gmail');
@@ -3551,7 +3737,8 @@
         function getCredentialsMessageText() {
             if (!activeCredShare) return '';
             const emailLine = activeCredShare.email ? `Gmail ID: ${activeCredShare.email}\n` : '';
-            return `नव युवक कोस्टा समाज समिति झांसी (उ. प्र.)\nरजिस्ट्रेशन संख्या - JHA/04043/2025-26\n\nनमस्ते ${activeCredShare.name},\nपोर्टल पर लॉगिन करने हेतु आपका विवरण:\n\n${emailLine}लॉगिन ID: ${activeCredShare.loginId}\nअस्थायी पासवर्ड: ${activeCredShare.password}\n\nकृपया अपनी Gmail ID या लॉगिन ID व इस अस्थायी पासवर्ड से लॉगिन करके तुरंत अपना नया पासवर्ड बदल लें।`;
+            const snLine = activeCredShare.sn ? `सदस्य क्रमांक: S.N. ${activeCredShare.sn}\n` : '';
+            return `नव युवक कोस्टा समाज समिति झांसी (उ. प्र.)\nरजिस्ट्रेशन संख्या - JHA/04043/2025-26\n\nनमस्ते ${getUserDisplayName(activeCredShare)},\nपोर्टल पर लॉगिन करने हेतु आपका विवरण:\n\n${snLine}${emailLine}लॉगिन ID: ${activeCredShare.loginId}\nअस्थायी पासवर्ड: ${activeCredShare.password}\n\nकृपया अपनी Gmail ID या लॉगिन ID व इस अस्थायी पासवर्ड से लॉगिन करके तुरंत अपना नया पासवर्ड बदल लें।`;
         }
 
         function shareCredentialsGmail() {
@@ -3719,8 +3906,10 @@
             const adminMode = isAdmin();
             const todayFormatted = new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-            document.getElementById('dash-welcome-name').textContent = currentUser ? currentUser.name : '';
-            document.getElementById('dash-user-loginid').textContent = currentUser ? `ID: ${currentUser.loginId}` : '';
+            document.getElementById('dash-welcome-name').textContent = currentUser ? getUserDisplayName(currentUser) : '';
+            document.getElementById('dash-user-loginid').textContent = currentUser
+                ? (currentUser.sn ? `S.N. ${currentUser.sn} • ID: ${currentUser.loginId}` : `ID: ${currentUser.loginId}`)
+                : '';
 
             document.getElementById('admin-summary-card').classList.toggle('hidden', !adminMode);
             document.getElementById('member-summary-card').classList.toggle('hidden', adminMode);
@@ -4262,7 +4451,7 @@
         function populateMemberNamesDatalist() {
             const dl = document.getElementById('members-name-datalist');
             if (!dl) return;
-            dl.innerHTML = (appData.users || []).map(u => `<option value="${escapeHtml(u.name)}"></option>`).join('');
+            dl.innerHTML = (appData.users || []).map(u => `<option value="${escapeHtml(getUserDisplayName(u))}"></option>`).join('');
         }
 
         function openTransactionModalWithType(presetType) {
@@ -4331,6 +4520,8 @@
 
             // Show org bank/UPI box only when a Member is submitting their own payment
             orgBox.classList.toggle('hidden', isAdmin());
+            const snLookupWrap = document.getElementById('tx-sn-lookup-wrap');
+            if (snLookupWrap) snLookupWrap.classList.toggle('hidden', !isAdmin() || txVal === 'expense');
 
             if (txVal === 'membership') {
                 personWrap.classList.remove('hidden');
@@ -4369,6 +4560,35 @@
             toggleUtrRequirement();
         }
 
+        function handleTxSnLookup(preservePerson = false) {
+            const inp = document.getElementById('tx-sn-lookup');
+            const statusEl = document.getElementById('tx-sn-lookup-status');
+            const personInput = document.getElementById('tx-person');
+            if (!inp || !statusEl) return;
+            const raw = (inp.value || '').trim();
+            if (!raw) {
+                statusEl.textContent = '';
+                statusEl.className = 'hidden text-[10.5px] font-bold leading-snug';
+                return;
+            }
+            const snNum = parseInt(raw, 10);
+            if (!/^\d+$/.test(raw) || !Number.isInteger(snNum) || snNum < 1) {
+                statusEl.textContent = 'कृपया सही S.N. संख्या दर्ज करें';
+                statusEl.className = 'text-[10.5px] font-bold leading-snug text-amber-800';
+                return;
+            }
+            const matched = (appData.users || []).find(u => Number(u.sn) === snNum);
+            if (matched) {
+                const display = getUserDisplayName(matched);
+                if (!preservePerson && personInput) personInput.value = display;
+                statusEl.textContent = `✓ सदस्य मिला: ${display} (${matched.loginId})`;
+                statusEl.className = 'text-[10.5px] font-bold leading-snug text-emerald-700';
+            } else {
+                statusEl.textContent = `S.N. ${snNum} से कोई सत्यापित सदस्य नहीं मिला (आप नीचे नाम सीधे लिख सकते हैं)`;
+                statusEl.className = 'text-[10.5px] font-bold leading-snug text-amber-800';
+            }
+        }
+
         function toggleUtrRequirement() {
             const mode = document.getElementById('tx-mode').value;
             const utrWrap = document.getElementById('tx-utr-wrapper');
@@ -4389,6 +4609,13 @@
             document.getElementById('tx-edit-id').value = '';
             document.getElementById('tx-date').value = new Date().toISOString().slice(0, 10);
             document.getElementById('tx-mode').value = isAdmin() ? 'नकद' : 'UPI / A/C ट्रांसफर';
+            const snLookup = document.getElementById('tx-sn-lookup');
+            const snStatus = document.getElementById('tx-sn-lookup-status');
+            if (snLookup) snLookup.value = '';
+            if (snStatus) {
+                snStatus.textContent = '';
+                snStatus.className = 'hidden text-[10.5px] font-bold leading-snug';
+            }
             renderOrgPaymentDetails();
 
             const modalTitle = document.getElementById('tx-modal-title');
@@ -4402,7 +4629,7 @@
             } else {
                 modalTitle.textContent = 'सहयोग / शुल्क विवरण भरें';
                 submitBtn.textContent = 'विवरण जमा करें';
-                personInput.value = currentUser ? currentUser.name : '';
+                personInput.value = currentUser ? getUserDisplayName(currentUser) : '';
             }
 
             handleTxTypeChange();
@@ -4424,6 +4651,13 @@
             document.getElementById('tx-utr').value = tx.utr || '';
             document.getElementById('tx-person').value = tx.person;
             document.getElementById('tx-purpose').value = tx.purpose;
+            const linkedUser = tx.userId ? (appData.users || []).find(u => u.id === tx.userId) : null;
+            const editSnVal = tx.memberSn || (linkedUser && linkedUser.sn ? linkedUser.sn : '');
+            const snLookup = document.getElementById('tx-sn-lookup');
+            if (snLookup && tx.type !== 'expense' && editSnVal) {
+                snLookup.value = editSnVal;
+                handleTxSnLookup(true);
+            }
             if (tx.billPhoto) {
                 pendingTxBillDataUrl = tx.billPhoto;
                 document.getElementById('tx-bill-status').textContent = 'भुगतान बिल फ़ोटो संलग्न है ✓';
@@ -4496,7 +4730,9 @@
             const filtered = ledger.yearTx.filter(t => {
                 const matchCat = accountFilter === 'all'
                     || (accountFilter === 'expense' ? t.type === 'expense' : (t.type !== 'expense' && t.txCategory === accountFilter));
-                const matchText = !q || `${t.person} ${t.purpose} ${t.receiptNo} ${t.utr || ''}`.toLowerCase().includes(q);
+                const dispPerson = getTxDisplayPerson(t);
+                const snExtra = t.memberSn ? `s.n. ${t.memberSn} sn ${t.memberSn} ${t.memberSn}` : '';
+                const matchText = !q || `${dispPerson} ${snExtra} ${t.person} ${t.purpose} ${t.receiptNo} ${t.utr || ''}`.toLowerCase().includes(q);
                 return matchCat && matchText;
             });
 
@@ -4510,6 +4746,7 @@
                 const isInc = t.type !== 'expense';
                 const isVerified = t.verified !== false;
                 const badge = getCategoryBadgeMeta(t);
+                const dispPerson = getTxDisplayPerson(t);
                 return `
                     <div class="bg-white rounded-2xl p-3.5 border ${!isVerified ? 'border-amber-300 bg-amber-50/20' : 'border-slate-200'} shadow-sm space-y-2">
                         <div class="flex items-start justify-between gap-2">
@@ -4522,7 +4759,7 @@
                                         ${isVerified ? 'सत्यापित ✓' : 'मिलान लंबित'}
                                     </span>
                                 </div>
-                                <h4 class="text-sm font-extrabold text-slate-900 mt-1">${escapeHtml(t.person)}</h4>
+                                <h4 class="text-sm font-extrabold text-slate-900 mt-1">${escapeHtml(dispPerson)}</h4>
                                 <p class="text-xs text-slate-600">${escapeHtml(t.purpose)}</p>
                                 ${t.utr ? `<p class="text-[11px] font-mono font-bold text-[#1E3A8A] mt-0.5">UTR / संदर्भ: ${escapeHtml(t.utr)}</p>` : ''}
                             </div>
@@ -4609,7 +4846,7 @@
                     return `
                         <div class="px-2.5 py-2 flex items-start justify-between gap-2">
                             <div class="min-w-0">
-                                <p class="font-bold text-slate-900">[${b.label}] ${escapeHtml(t.person)} <span class="font-mono text-[10px] text-slate-500">(${escapeHtml(t.receiptNo)})</span></p>
+                                <p class="font-bold text-slate-900">[${b.label}] ${escapeHtml(getTxDisplayPerson(t))} <span class="font-mono text-[10px] text-slate-500">(${escapeHtml(t.receiptNo)})</span></p>
                                 <p class="text-slate-600">${escapeHtml(t.purpose)} • ${formatDateHindi(t.date)} • ${escapeHtml(t.mode)}${t.billPhoto ? ' • बिल संलग्न ✓' : ''}</p>
                             </div>
                             <span class="font-mono font-extrabold shrink-0 ${t.type !== 'expense' ? 'text-emerald-700' : 'text-rose-700'}">
@@ -4626,7 +4863,7 @@
             const tx = appData.transactions.find(t => t.id === txId);
             if (!tx) return;
             const b = getCategoryBadgeMeta(tx);
-            const text = `नव युवक कोस्टा समाज समिति झांसी (उ. प्र.)\nरजिस्ट्रेशन संख्या - JHA/04043/2025-26\n\n${b.label} रसीद\nरसीद क्र.: ${tx.receiptNo}\nदिनांक: ${formatDateHindi(tx.date)}\nनाम: ${tx.person}\nविवरण: ${tx.purpose}\nधनराशि: ${formatINR(tx.amount)}\nमाध्यम: ${tx.mode}${tx.utr ? ' (UTR: ' + tx.utr + ')' : ''}\nस्थिति: ${tx.verified !== false ? 'सत्यापित ✓' : 'मिलान लंबित'}`;
+            const text = `नव युवक कोस्टा समाज समिति झांसी (उ. प्र.)\nरजिस्ट्रेशन संख्या - JHA/04043/2025-26\n\n${b.label} रसीद\nरसीद क्र.: ${tx.receiptNo}\nदिनांक: ${formatDateHindi(tx.date)}\nनाम: ${getTxDisplayPerson(tx)}\nविवरण: ${tx.purpose}\nधनराशि: ${formatINR(tx.amount)}\nमाध्यम: ${tx.mode}${tx.utr ? ' (UTR: ' + tx.utr + ')' : ''}\nस्थिति: ${tx.verified !== false ? 'सत्यापित ✓' : 'मिलान लंबित'}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
@@ -4652,7 +4889,7 @@
             document.getElementById('rcpt-no').textContent = tx.receiptNo;
             document.getElementById('rcpt-date').textContent = formatDateHindi(tx.date);
             document.getElementById('rcpt-type').textContent = b.label;
-            document.getElementById('rcpt-person').textContent = tx.person;
+            document.getElementById('rcpt-person').textContent = getTxDisplayPerson(tx);
             document.getElementById('rcpt-purpose').textContent = tx.purpose;
             document.getElementById('rcpt-mode').textContent = tx.mode;
             document.getElementById('rcpt-utr').textContent = tx.utr || 'उल्लिखित नहीं';
@@ -4677,11 +4914,50 @@
             const pendingList = document.getElementById('pending-members-list');
             if (isAdmin() && appData.pendingMembers.length > 0) {
                 pendingSec.classList.remove('hidden');
-                pendingList.innerHTML = appData.pendingMembers.map(p => `
+
+                // Compute collision-free prospective S.N. for pending new members
+                const usedSnSet = new Set();
+                (appData.users || []).forEach(u => {
+                    const n = parseInt(u.sn, 10);
+                    if (Number.isInteger(n) && n > 0) usedSnSet.add(n);
+                });
+                (appData.pendingMembers || []).forEach(p => {
+                    const n = parseInt(p.assignedSn || (p.memberType === 'old' ? p.requestedSn : null), 10);
+                    if (Number.isInteger(n) && n > 0) usedSnSet.add(n);
+                });
+                const { lastOfflineSn } = getSnConfig();
+                const prospectiveSnMap = {};
+                let nextNewCand = lastOfflineSn + 1;
+                [...(appData.pendingMembers || [])].reverse().forEach(p => {
+                    if (!p.assignedSn && !(p.memberType === 'old' && p.requestedSn)) {
+                        while (usedSnSet.has(nextNewCand)) nextNewCand++;
+                        prospectiveSnMap[p.id] = nextNewCand;
+                        usedSnSet.add(nextNewCand);
+                        nextNewCand++;
+                    }
+                });
+
+                pendingList.innerHTML = appData.pendingMembers.map(p => {
+                    const hasEditedSn = Number.isInteger(parseInt(p.assignedSn, 10)) && parseInt(p.assignedSn, 10) > 0;
+                    const isOldMember = p.memberType === 'old' && Number.isInteger(parseInt(p.requestedSn, 10)) && parseInt(p.requestedSn, 10) > 0;
+                    const effectiveSn = hasEditedSn
+                        ? parseInt(p.assignedSn, 10)
+                        : (isOldMember ? parseInt(p.requestedSn, 10) : (prospectiveSnMap[p.id] || getNextAvailableNewSn()));
+
+                    const snBadgeHtml = hasEditedSn
+                        ? `<span class="inline-block px-2 py-0.5 rounded-md bg-indigo-100 text-[#1E3A8A] text-[10.5px] font-mono font-extrabold">S.N. ${escapeHtml(effectiveSn)}</span>`
+                        : (isOldMember
+                            ? `<span class="inline-block px-2 py-0.5 rounded-md bg-indigo-100 text-[#1E3A8A] text-[10.5px] font-mono font-extrabold">S.N. ${escapeHtml(effectiveSn)}</span>`
+                            : `<span class="inline-block px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10.5px] font-extrabold">नया — संभावित S.N. ${escapeHtml(effectiveSn)}</span>`);
+
+                    return `
                     <div class="bg-white rounded-xl p-3 border border-amber-200 space-y-2 shadow-sm">
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
-                                <p class="text-xs font-extrabold text-slate-900">${escapeHtml(p.name)}</p>
+                                <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                    ${snBadgeHtml}
+                                    <p class="text-xs font-extrabold text-slate-900">${escapeHtml(p.name)}</p>
+                                </div>
                                 <p class="text-[11px] text-slate-600">${escapeHtml(p.address)} • +91 ${escapeHtml(p.mobile)}</p>
                                 <p class="text-[11px] font-bold text-emerald-800 mt-1">
                                     जमा शुल्क: ${formatINR(p.feeAmount)} (${escapeHtml(p.mode)})
@@ -4689,6 +4965,15 @@
                                 <p class="text-[11px] font-mono font-bold text-[#1E3A8A]">UTR / Ref: ${escapeHtml(p.utr)}</p>
                             </div>
                             <span class="text-[10px] font-bold text-slate-400 shrink-0">${formatDateHindi(p.appliedDate)}</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-amber-50/80 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                            <label for="pending-sn-input-${escapeHtml(p.id)}" class="text-[10.5px] font-extrabold text-amber-950 shrink-0">S.N. जांचें / सुधारें:</label>
+                            <input id="pending-sn-input-${escapeHtml(p.id)}" type="number" min="1" inputmode="numeric" value="${escapeHtml(effectiveSn)}"
+                                class="w-24 px-2 py-1 rounded-lg border border-amber-300 bg-white text-xs font-mono font-extrabold text-[#1E3A8A] outline-none focus:border-[#1E3A8A]">
+                            <button type="button" onclick="updatePendingMemberSn('${escapeHtml(p.id)}')"
+                                class="px-2.5 py-1 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-[#1E3A8A] text-[10.5px] font-extrabold shrink-0">
+                                S.N. सेव
+                            </button>
                         </div>
                         <div class="flex gap-2 pt-1.5 border-t border-slate-100">
                             <button type="button" onclick="approvePendingMember('${escapeHtml(p.id)}')"
@@ -4701,15 +4986,38 @@
                             </button>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
             } else {
                 pendingSec.classList.add('hidden');
             }
 
             const q = (document.getElementById('member-search').value || '').trim().toLowerCase();
-            const filtered = appData.users.filter(u =>
-                !q || `${u.name} ${u.loginId} ${u.mobile} ${u.address}`.toLowerCase().includes(q)
-            );
+            const qDigits = q.replace(/^s\.?n\.?\s*/i, '').trim();
+            const filtered = appData.users.filter(u => {
+                if (!q) return true;
+                const snStr = u.sn ? `s.n. ${u.sn} sn ${u.sn} ${u.sn}` : '';
+                if (/^\d+$/.test(qDigits) && u.sn && String(u.sn) === qDigits) return true;
+                return `${snStr} ${u.name} ${u.loginId} ${u.mobile} ${u.address}`.toLowerCase().includes(q);
+            });
+            if (memberSortMode === 'sn') {
+                filtered.sort((a, b) => {
+                    const snA = Number.isInteger(parseInt(a.sn, 10)) ? parseInt(a.sn, 10) : Number.MAX_SAFE_INTEGER;
+                    const snB = Number.isInteger(parseInt(b.sn, 10)) ? parseInt(b.sn, 10) : Number.MAX_SAFE_INTEGER;
+                    if (snA !== snB) return snA - snB;
+                    return String(a.name || '').localeCompare(String(b.name || ''), 'hi');
+                });
+            }
+            if (/^\d+$/.test(qDigits)) {
+                filtered.sort((a, b) => (String(b.sn || '') === qDigits ? 1 : 0) - (String(a.sn || '') === qDigits ? 1 : 0));
+            }
+
+            const countLabel = document.getElementById('members-count-label');
+            if (countLabel) {
+                countLabel.textContent = q
+                    ? `मिलान सदस्य: ${filtered.length} / ${appData.users.length}`
+                    : `कुल सदस्य: ${appData.users.length}`;
+            }
 
             const list = document.getElementById('members-list');
             if (filtered.length === 0) {
@@ -4722,12 +5030,12 @@
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <h4 class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(u.name)}</h4>
+                                <h4 class="text-sm font-extrabold text-slate-900 truncate">${u.sn ? `<span class="text-[#1E3A8A] font-mono">S.N. ${escapeHtml(u.sn)}</span> • ` : ''}${escapeHtml(u.name)}</h4>
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${u.role === 'admin' ? 'bg-amber-100 text-amber-900' : 'bg-indigo-50 text-indigo-800'}">
                                     ${u.role === 'admin' ? 'पदाधिकारी / एडमिन' : 'सदस्य'}
                                 </span>
                             </div>
-                            <p class="text-xs font-mono font-extrabold text-[#1E3A8A] mt-0.5">लॉगिन ID: ${escapeHtml(u.loginId)}</p>
+                            <p class="text-xs font-mono font-extrabold text-[#1E3A8A] mt-0.5">${u.sn ? `S.N. ${escapeHtml(u.sn)} • ` : ''}लॉगिन ID: ${escapeHtml(u.loginId)}</p>
                             <p class="text-xs text-slate-600">${escapeHtml(u.address)}</p>
                             <p class="text-xs font-mono font-bold text-slate-700">+91 ${escapeHtml(u.mobile)}</p>
                         </div>
@@ -4735,27 +5043,72 @@
                             कॉल करें
                         </a>
                     </div>
-                    ${isAdmin() && u.id !== currentUser.id ? `
-                        <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                            <button type="button" onclick="resetMemberPassword('${escapeHtml(u.id)}')"
-                                class="px-3 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[11px] font-bold">
-                                पासवर्ड रीसेट
+                    ${isAdmin() ? `
+                        <div class="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-100">
+                            <button type="button" onclick="openEditMemberSnModal('${escapeHtml(u.id)}')"
+                                class="px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-[#1E3A8A] border border-indigo-200 text-[11px] font-bold">
+                                ${u.sn ? 'S.N. एडिट' : '+ S.N. जोड़ें'}
                             </button>
-                            <button type="button" onclick="deleteMember('${escapeHtml(u.id)}')"
-                                class="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold">
-                                हटाएँ
-                            </button>
+                            ${u.id !== currentUser.id ? `
+                                <button type="button" onclick="resetMemberPassword('${escapeHtml(u.id)}')"
+                                    class="px-3 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-[11px] font-bold">
+                                    पासवर्ड रीसेट
+                                </button>
+                                <button type="button" onclick="deleteMember('${escapeHtml(u.id)}')"
+                                    class="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold">
+                                    हटाएँ
+                                </button>
+                            ` : ''}
                         </div>
                     ` : ''}
                 </div>
             `).join('');
         }
 
+        function updatePendingMemberSn(reqId) {
+            if (!isAdmin()) return;
+            const req = appData.pendingMembers.find(p => p.id === reqId);
+            if (!req) return;
+            const inp = document.getElementById(`pending-sn-input-${reqId}`);
+            const val = parseInt(inp ? inp.value : '', 10);
+            if (!Number.isInteger(val) || val < 1) {
+                return showToast('कृपया 1 या उससे बड़ी सही S.N. संख्या दर्ज करें');
+            }
+            const conflict = findSnConflict(val, null, reqId);
+            if (conflict) {
+                return showToast(`चेतावनी: S.N. ${val} पहले से ${conflict.type === 'user' ? 'सत्यापित सदस्य' : 'लंबित आवेदन'} (${conflict.record.name}) में दर्ज है!`);
+            }
+            req.assignedSn = val;
+            saveData();
+            renderMembers();
+            showToast(`S.N. ${val} सुरक्षित किया गया ✓`);
+        }
+
         function approvePendingMember(reqId) {
             if (!isAdmin()) return;
             const idx = appData.pendingMembers.findIndex(p => p.id === reqId);
             if (idx === -1) return;
-            const req = appData.pendingMembers.splice(idx, 1)[0];
+            const req = appData.pendingMembers[idx];
+
+            // Determine final S.N. (respecting admin edit before verify)
+            const snInputEl = document.getElementById(`pending-sn-input-${reqId}`);
+            const rawInputSn = snInputEl ? parseInt(snInputEl.value, 10) : NaN;
+            let finalSn = Number.isInteger(rawInputSn) && rawInputSn >= 1
+                ? rawInputSn
+                : (req.assignedSn
+                    ? parseInt(req.assignedSn, 10)
+                    : (req.memberType === 'old' && req.requestedSn ? parseInt(req.requestedSn, 10) : getNextAvailableNewSn(reqId)));
+
+            if (!Number.isInteger(finalSn) || finalSn < 1) {
+                return showToast('कृपया वेरीफाई करने से पहले सही S.N. संख्या दर्ज करें');
+            }
+            const conflict = findSnConflict(finalSn, null, reqId);
+            if (conflict) {
+                return showToast(`डुप्लीकेट S.N.! S.N. ${finalSn} पहले से ${conflict.record.name} के नाम पर दर्ज है`);
+            }
+
+            // Remove from pending only after S.N. validation succeeds
+            appData.pendingMembers.splice(idx, 1);
 
             const loginId = generateNextLoginId();
             const tempPass = generateTempPassword();
@@ -4763,6 +5116,7 @@
 
             const newMember = {
                 id: 'u_' + Date.now(),
+                sn: finalSn,
                 loginId,
                 password: tempPass,
                 mustChangePassword: true,
@@ -4778,12 +5132,13 @@
             appData.transactions.unshift({
                 id: 'tx_' + Date.now(),
                 userId: newMember.id,
+                memberSn: finalSn,
                 receiptNo: `NYKSS-${new Date().getFullYear()}-${seq}`,
                 type: 'income',
                 amount: Number(req.feeAmount) || 500,
-                person: `${req.name} (${loginId})`,
+                person: `${formatNameWithSn(req.name, finalSn)} (${loginId})`,
                 txCategory: 'membership',
-                purpose: 'नई सदस्यता शुल्क (वेरीफाई)',
+                purpose: req.memberType === 'old' ? 'सदस्यता शुल्क — पुराना सदस्य (वेरीफाई)' : 'नई सदस्यता शुल्क (वेरीफाई)',
                 mode: req.mode || 'UPI',
                 utr: req.utr || 'VERIFIED',
                 verified: true,
@@ -4792,7 +5147,7 @@
 
             saveData();
             renderMembers();
-            openCredentialsModal(newMember, 'सदस्यता वेरीफाई एवं ID जारी ✓');
+            openCredentialsModal(newMember, `सदस्यता वेरीफाई एवं S.N. ${finalSn} जारी ✓`);
         }
 
         function resetMemberPassword(userId) {
@@ -5917,6 +6272,31 @@
         document.getElementById('form-signup').addEventListener('submit', function (e) {
             e.preventDefault();
             if (appData.membershipWindow && appData.membershipWindow.isOpen === false) return showToast('क्षमा करें, नया सदस्यता आवेदन अभी बंद है');
+
+            const { lastOfflineSn, allowOldMemberSn } = getSnConfig();
+            let memberType = 'new';
+            let requestedSn = null;
+
+            if (allowOldMemberSn) {
+                const selectedRadio = document.querySelector('input[name="signup-member-type"]:checked');
+                memberType = selectedRadio ? selectedRadio.value : 'new';
+                if (memberType === 'old') {
+                    const rawSn = (document.getElementById('signup-sn').value || '').trim();
+                    const snNum = parseInt(rawSn, 10);
+                    if (!/^\d+$/.test(rawSn) || !Number.isInteger(snNum) || snNum < 1 || snNum > lastOfflineSn) {
+                        checkSignupSnLive();
+                        return showToast(`कृपया पुराना सदस्य क्रमांक (S.N.) 1 से ${lastOfflineSn} के बीच दर्ज करें`);
+                    }
+                    const conflict = findSnConflict(snNum);
+                    if (conflict) {
+                        checkSignupSnLive();
+                        const conflictLabel = conflict.type === 'user' ? 'सत्यापित सदस्य' : 'लंबित सदस्य आवेदन';
+                        return showToast(`चेतावनी: S.N. ${snNum} पहले से ${conflictLabel} (${conflict.record.name}) के नाम पर दर्ज है!`);
+                    }
+                    requestedSn = snNum;
+                }
+            }
+
             const name = document.getElementById('signup-name').value.trim();
             const mobile = document.getElementById('signup-mobile').value.trim();
             const address = document.getElementById('signup-address').value.trim();
@@ -5934,6 +6314,9 @@
 
             appData.pendingMembers.unshift({
                 id: 'pm_' + Date.now(),
+                memberType,
+                requestedSn,
+                assignedSn: null,
                 name,
                 mobile,
                 address,
@@ -5945,6 +6328,7 @@
             saveData();
             this.reset();
             document.getElementById('signup-fee').value = 500;
+            renderSignupSnSection();
             isGuestMode = false;
             document.getElementById('screen-main').classList.add('hidden');
             document.getElementById('screen-auth').classList.remove('hidden');
@@ -6051,8 +6435,27 @@
             }
 
             const rawPerson = document.getElementById('tx-person').value.trim();
+            const rawSnLookup = (document.getElementById('tx-sn-lookup') ? document.getElementById('tx-sn-lookup').value : '').trim();
             const rawPurpose = document.getElementById('tx-purpose').value.trim();
-            const finalPerson = txType === 'expense' ? (rawPerson || 'समिति व्यय') : rawPerson;
+            let finalPerson = txType === 'expense' ? (rawPerson || 'समिति व्यय') : rawPerson;
+            let matchedUser = null;
+            if (txType !== 'expense') {
+                if (rawPerson) {
+                    const lowerP = rawPerson.toLowerCase();
+                    matchedUser = (appData.users || []).find(u =>
+                        getUserDisplayName(u).toLowerCase() === lowerP ||
+                        u.name.toLowerCase() === lowerP ||
+                        (u.sn && (`s.n. ${u.sn}` === lowerP || String(u.sn) === lowerP))
+                    );
+                }
+                if (!matchedUser && /^\d+$/.test(rawSnLookup)) {
+                    const lookupNum = parseInt(rawSnLookup, 10);
+                    matchedUser = (appData.users || []).find(u => Number(u.sn) === lookupNum) || null;
+                }
+                if (matchedUser && matchedUser.sn) {
+                    finalPerson = getUserDisplayName(matchedUser);
+                }
+            }
             const finalPurpose = txCategory === 'membership'
                 ? (rawPurpose || `वार्षिक सदस्यता शुल्क (${getSelectedAccountYear()})`)
                 : (txCategory === 'other' ? (rawPurpose || 'अन्य सहयोग राशि') : rawPurpose);
@@ -6067,6 +6470,10 @@
                     tx.txCategory = txCategory;
                     tx.amount = amount;
                     tx.person = finalPerson;
+                    if (matchedUser) {
+                        tx.userId = matchedUser.id;
+                        if (matchedUser.sn) tx.memberSn = matchedUser.sn;
+                    }
                     tx.purpose = finalPurpose;
                     tx.mode = mode;
                     tx.utr = utr || tx.utr;
@@ -6085,7 +6492,8 @@
             const seq = String(appData.transactions.length + 1).padStart(3, '0');
             const newTx = {
                 id: 'tx_' + Date.now(),
-                userId: currentUser.id,
+                userId: matchedUser ? matchedUser.id : currentUser.id,
+                memberSn: matchedUser && matchedUser.sn ? matchedUser.sn : (txType !== 'expense' && currentUser && currentUser.sn && !isAdmin() ? currentUser.sn : null),
                 receiptNo: `NYKSS-${new Date().getFullYear()}-${seq}`,
                 type: txType,
                 txCategory,
@@ -6154,8 +6562,25 @@
             if (!/^\d{10}$/.test(mobile)) return showToast('10 अंकों का मोबाइल नंबर दर्ज करें');
             if (appData.users.some(u => u.mobile === mobile)) return showToast('यह मोबाइल नंबर पहले से दर्ज है');
 
+            const rawSn = (document.getElementById('mem-sn') ? document.getElementById('mem-sn').value : '').trim();
+            let assignedSn = null;
+            if (rawSn) {
+                const snNum = parseInt(rawSn, 10);
+                if (!/^\d+$/.test(rawSn) || !Number.isInteger(snNum) || snNum < 1) {
+                    return showToast('कृपया 1 या उससे बड़ी सही S.N. संख्या दर्ज करें');
+                }
+                const conflict = findSnConflict(snNum);
+                if (conflict) {
+                    return showToast(`डुप्लीकेट S.N.! S.N. ${snNum} पहले से ${conflict.record.name} के नाम पर दर्ज है`);
+                }
+                assignedSn = snNum;
+            } else {
+                assignedSn = getNextAvailableNewSn();
+            }
+
             const newMember = {
                 id: 'u_' + Date.now(),
+                sn: assignedSn,
                 loginId: generateNextLoginId(),
                 password: generateTempPassword(),
                 mustChangePassword: true,
@@ -6170,7 +6595,7 @@
             this.reset();
             closeModal('modal-member');
             renderMembers();
-            openCredentialsModal(newMember, 'नया सदस्य जोड़ा गया एवं ID जारी ✓');
+            openCredentialsModal(newMember, `नया सदस्य जोड़ा गया एवं S.N. ${assignedSn} जारी ✓`);
         });
 
         document.getElementById('form-biodata').addEventListener('submit', function (e) {
@@ -6470,16 +6895,22 @@
             const pop = document.getElementById('profile-menu-popover');
             const isHidden = pop.classList.contains('hidden');
             if (isHidden) {
-                document.getElementById('pm-user-name').textContent = currentUser.name;
-                document.getElementById('pm-user-id').textContent = currentUser.email
-                    ? `${currentUser.email} • ${currentUser.loginId}`
-                    : currentUser.loginId;
+                document.getElementById('pm-user-name').textContent = getUserDisplayName(currentUser);
+                const idParts = [];
+                if (currentUser.sn) idParts.push(`S.N. ${currentUser.sn}`);
+                if (currentUser.email) idParts.push(currentUser.email);
+                idParts.push(currentUser.loginId);
+                document.getElementById('pm-user-id').textContent = idParts.join(' • ');
                 document.getElementById('pm-user-role').textContent = getAdminRoleHindiLabel(currentUser.role);
                 document.getElementById('pm-btn-admin-mgr').classList.toggle('hidden', !isMasterAdmin());
                 document.getElementById('pm-btn-office-addr').classList.toggle('hidden', !isMasterAdmin());
                 document.getElementById('pm-btn-mat-toggle').classList.toggle('hidden', !isMasterAdmin());
                 document.getElementById('pm-btn-stu-toggle').classList.toggle('hidden', !isMasterAdmin());
                 document.getElementById('pm-btn-mem-toggle').classList.toggle('hidden', !isMasterAdmin());
+                const snBtn = document.getElementById('pm-btn-sn-settings');
+                if (snBtn) snBtn.classList.toggle('hidden', !isMasterAdmin());
+                const snBadge = document.getElementById('pm-sn-summary-badge');
+                if (snBadge) snBadge.textContent = getSnConfig().lastOfflineSn;
                 updatePublicLandingBadges();
                 applySavedTheme();
                 pop.classList.remove('hidden');
@@ -6491,6 +6922,357 @@
         function closeProfileMenu() {
             const pop = document.getElementById('profile-menu-popover');
             if (pop) pop.classList.add('hidden');
+        }
+
+        // ==================== DYNAMIC MEMBERSHIP S.N. SYSTEM ====================
+        function getSnConfig() {
+            if (!appData || !appData.snConfig || typeof appData.snConfig !== 'object') {
+                if (appData) appData.snConfig = { lastOfflineSn: 189, allowOldMemberSn: true };
+                return { lastOfflineSn: 189, allowOldMemberSn: true };
+            }
+            const parsed = parseInt(appData.snConfig.lastOfflineSn, 10);
+            const lastOfflineSn = (Number.isInteger(parsed) && parsed >= 1) ? parsed : 189;
+            const allowOldMemberSn = appData.snConfig.allowOldMemberSn !== false;
+            return { lastOfflineSn, allowOldMemberSn };
+        }
+
+        function formatNameWithSn(name, sn) {
+            const cleanName = String(name || '').trim();
+            const num = parseInt(sn, 10);
+            if (Number.isInteger(num) && num > 0) {
+                if (/^S\.N\.\s*\d+/i.test(cleanName)) return cleanName;
+                return `S.N. ${num} • ${cleanName}`;
+            }
+            return cleanName;
+        }
+
+        function getUserDisplayName(user) {
+            if (!user) return '';
+            return formatNameWithSn(user.name, user.sn);
+        }
+
+        function getTxDisplayPerson(tx) {
+            if (!tx) return '';
+            const raw = String(tx.person || '').trim();
+            if (/^S\.N\.\s*\d+/i.test(raw)) return raw;
+            if (tx.memberSn) return formatNameWithSn(raw, tx.memberSn);
+            if (tx.userId && appData && appData.users) {
+                const u = appData.users.find(usr => usr.id === tx.userId && usr.sn);
+                if (u) return formatNameWithSn(raw, u.sn);
+            }
+            return raw;
+        }
+
+        function findSnConflict(snNum, excludeUserId = null, excludePendingId = null) {
+            const num = parseInt(snNum, 10);
+            if (!Number.isInteger(num) || num < 1) return null;
+            const existingUser = (appData.users || []).find(u =>
+                u.id !== excludeUserId && Number(u.sn) === num
+            );
+            if (existingUser) return { type: 'user', record: existingUser };
+
+            const existingPending = (appData.pendingMembers || []).find(p => {
+                if (p.id === excludePendingId) return false;
+                if (p.assignedSn && Number(p.assignedSn) === num) return true;
+                if (!p.assignedSn && p.memberType === 'old' && Number(p.requestedSn) === num) return true;
+                return false;
+            });
+            if (existingPending) return { type: 'pending', record: existingPending };
+            return null;
+        }
+
+        function getNextAvailableNewSn(excludePendingId = null) {
+            const { lastOfflineSn } = getSnConfig();
+            const used = new Set();
+            (appData.users || []).forEach(u => {
+                const n = parseInt(u.sn, 10);
+                if (Number.isInteger(n) && n > 0) used.add(n);
+            });
+            (appData.pendingMembers || []).forEach(p => {
+                if (p.id === excludePendingId) return;
+                const n = parseInt(p.assignedSn || (p.memberType === 'old' ? p.requestedSn : null), 10);
+                if (Number.isInteger(n) && n > 0) used.add(n);
+            });
+            let cand = lastOfflineSn + 1;
+            while (used.has(cand)) cand++;
+            return cand;
+        }
+
+        let memberSortMode = 'recent';
+
+        function setMemberSortMode(mode) {
+            memberSortMode = mode === 'sn' ? 'sn' : 'recent';
+            const btnRecent = document.getElementById('member-sort-recent');
+            const btnSn = document.getElementById('member-sort-sn');
+            if (btnRecent && btnSn) {
+                btnRecent.className = memberSortMode === 'recent'
+                    ? 'px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition brand-gradient text-white shadow-sm'
+                    : 'px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition text-slate-600';
+                btnSn.className = memberSortMode === 'sn'
+                    ? 'px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition brand-gradient text-white shadow-sm'
+                    : 'px-2.5 py-1 rounded-md text-[10.5px] font-extrabold transition text-slate-600';
+            }
+            renderMembers();
+        }
+
+        function openAddMemberModal() {
+            if (!isAdmin()) return;
+            const form = document.getElementById('form-member');
+            if (form) form.reset();
+            const snInput = document.getElementById('mem-sn');
+            if (snInput) {
+                snInput.placeholder = `उदा. 45 या खाली छोड़ें (अगला नया: S.N. ${getNextAvailableNewSn()})`;
+            }
+            openModal('modal-member');
+        }
+
+        function openEditMemberSnModal(userId) {
+            if (!isAdmin()) return;
+            const user = (appData.users || []).find(u => u.id === userId);
+            if (!user) return;
+            document.getElementById('edit-mem-sn-user-id').value = user.id;
+            document.getElementById('edit-mem-sn-subtitle').textContent = `${user.name} (${user.loginId})`;
+            const inp = document.getElementById('edit-mem-sn-input');
+            inp.value = user.sn ? String(user.sn) : '';
+            inp.placeholder = `उदा. ${user.sn || getNextAvailableNewSn()}`;
+            checkEditMemberSnLive();
+            openModal('modal-edit-member-sn');
+        }
+
+        function fillNextSnInEditModal() {
+            const inp = document.getElementById('edit-mem-sn-input');
+            if (!inp) return;
+            inp.value = String(getNextAvailableNewSn());
+            checkEditMemberSnLive();
+        }
+
+        function checkEditMemberSnLive() {
+            const userId = document.getElementById('edit-mem-sn-user-id').value;
+            const inp = document.getElementById('edit-mem-sn-input');
+            const warn = document.getElementById('edit-mem-sn-warning');
+            if (!inp || !warn) return false;
+            const raw = (inp.value || '').trim();
+            if (!raw) {
+                warn.textContent = '';
+                warn.className = 'hidden text-[11px] font-bold rounded-lg px-2.5 py-1.5 mt-1.5 leading-snug';
+                return false;
+            }
+            const snNum = parseInt(raw, 10);
+            if (!/^\d+$/.test(raw) || !Number.isInteger(snNum) || snNum < 1) {
+                warn.textContent = '⚠️ कृपया 1 या उससे बड़ी सही S.N. संख्या दर्ज करें।';
+                warn.className = 'text-[11px] font-bold rounded-lg px-2.5 py-1.5 mt-1.5 leading-snug bg-rose-50 text-rose-700 border border-rose-200';
+                return false;
+            }
+            const conflict = findSnConflict(snNum, userId, null);
+            if (conflict) {
+                const who = conflict.type === 'user' ? 'सत्यापित सदस्य' : 'लंबित आवेदन';
+                warn.textContent = `⚠️ डुप्लीकेट S.N.! S.N. ${snNum} पहले से ${who} (${conflict.record.name}) के नाम पर दर्ज है।`;
+                warn.className = 'text-[11px] font-bold rounded-lg px-2.5 py-1.5 mt-1.5 leading-snug bg-rose-50 text-rose-700 border border-rose-200';
+                return false;
+            }
+            warn.textContent = `✓ S.N. ${snNum} उपलब्ध है।`;
+            warn.className = 'text-[11px] font-bold rounded-lg px-2.5 py-1.5 mt-1.5 leading-snug bg-emerald-50 text-emerald-800 border border-emerald-200';
+            return true;
+        }
+
+        document.getElementById('form-edit-member-sn').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!isAdmin()) return;
+            const userId = document.getElementById('edit-mem-sn-user-id').value;
+            const user = (appData.users || []).find(u => u.id === userId);
+            if (!user) return;
+            const raw = (document.getElementById('edit-mem-sn-input').value || '').trim();
+            const snNum = parseInt(raw, 10);
+            if (!/^\d+$/.test(raw) || !Number.isInteger(snNum) || snNum < 1) {
+                return showToast('कृपया 1 या उससे बड़ी सही S.N. संख्या दर्ज करें');
+            }
+            const conflict = findSnConflict(snNum, user.id, null);
+            if (conflict) {
+                return showToast(`डुप्लीकेट S.N.! S.N. ${snNum} पहले से ${conflict.record.name} के नाम पर दर्ज है`);
+            }
+            user.sn = snNum;
+            if (currentUser && currentUser.id === user.id) {
+                currentUser.sn = snNum;
+            }
+            // Keep existing linked account transactions in sync with updated S.N.
+            (appData.transactions || []).forEach(t => {
+                if (t.userId === user.id && t.type !== 'expense') {
+                    t.memberSn = snNum;
+                    const stripped = String(t.person || '').replace(/^S\.N\.\s*\d+\s*•\s*/i, '').trim();
+                    if (stripped) {
+                        t.person = formatNameWithSn(stripped, snNum);
+                    }
+                }
+            });
+            saveData();
+            closeModal('modal-edit-member-sn');
+            renderMembers();
+            renderDashboard();
+            populateMemberNamesDatalist();
+            showToast(`${user.name} का S.N. ${snNum} सेव किया गया ✓`);
+        });
+
+        function updateSnSettingsModalToggleUI(isOn) {
+            const btn = document.getElementById('sn-set-allow-old-toggle');
+            if (!btn) return;
+            if (isOn) {
+                btn.textContent = 'चालू ✓';
+                btn.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold shrink-0 transition bg-emerald-600 text-white shadow-sm';
+            } else {
+                btn.textContent = 'बंद ✕';
+                btn.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold shrink-0 transition bg-rose-600 text-white shadow-sm';
+            }
+        }
+
+        function updateSnSettingsPreview() {
+            const inp = document.getElementById('sn-set-last-offline');
+            const hint = document.getElementById('sn-set-preview-hint');
+            if (!inp || !hint) return;
+            const val = parseInt(inp.value, 10);
+            if (Number.isInteger(val) && val >= 1) {
+                hint.textContent = `पुराना सदस्य: S.N. 1 से ${val} तक • नया सदस्य स्वतः शुरू: S.N. ${val + 1} से`;
+            } else {
+                hint.textContent = 'कृपया 1 या उससे बड़ी मान्य संख्या दर्ज करें (उदा. 189, 205, 220)';
+            }
+        }
+
+        function openSnSettingsModal() {
+            if (!isMasterAdmin()) return;
+            closeProfileMenu();
+            const cfg = getSnConfig();
+            document.getElementById('sn-set-last-offline').value = cfg.lastOfflineSn;
+            updateSnSettingsPreview();
+            updateSnSettingsModalToggleUI(cfg.allowOldMemberSn);
+            openModal('modal-sn-settings');
+        }
+
+        function toggleAllowOldMemberSnInModal() {
+            if (!isMasterAdmin()) return;
+            const cfg = getSnConfig();
+            appData.snConfig.allowOldMemberSn = !cfg.allowOldMemberSn;
+            saveData();
+            updateSnSettingsModalToggleUI(appData.snConfig.allowOldMemberSn);
+            renderSignupSnSection();
+            showToast(appData.snConfig.allowOldMemberSn
+                ? 'पुराना सदस्य (S.N.) विकल्प चालू कर दिया गया ✓'
+                : 'पुराना सदस्य (S.N.) विकल्प बंद कर दिया गया'
+            );
+        }
+
+        document.getElementById('form-sn-settings').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!isMasterAdmin()) return;
+            const rawVal = (document.getElementById('sn-set-last-offline').value || '').trim();
+            const parsed = parseInt(rawVal, 10);
+            if (!/^\d+$/.test(rawVal) || !Number.isInteger(parsed) || parsed < 1) {
+                return showToast('कृपया 1 या उससे बड़ी सही अंतिम ऑफ़लाइन S.N. संख्या दर्ज करें');
+            }
+            appData.snConfig = appData.snConfig || { lastOfflineSn: 189, allowOldMemberSn: true };
+            appData.snConfig.lastOfflineSn = parsed;
+            saveData();
+            const snBadge = document.getElementById('pm-sn-summary-badge');
+            if (snBadge) snBadge.textContent = parsed;
+            renderSignupSnSection();
+            if (currentView === 'members') renderMembers();
+            closeModal('modal-sn-settings');
+            showToast(`S.N. सेटिंग सहेजी गई ✓ (ऑफ़लाइन S.N. 1–${parsed}, नया ${parsed + 1} से)`);
+        });
+
+        function renderSignupSnSection() {
+            const section = document.getElementById('signup-sn-section');
+            const snInput = document.getElementById('signup-sn');
+            if (!section || !snInput) return;
+
+            const { lastOfflineSn, allowOldMemberSn } = getSnConfig();
+            if (!allowOldMemberSn) {
+                section.classList.add('hidden');
+                snInput.required = false;
+                snInput.value = '';
+                const warn = document.getElementById('signup-sn-warning');
+                if (warn) warn.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            const oldRangeEl = document.getElementById('signup-old-range-label');
+            const newRangeEl = document.getElementById('signup-new-range-label');
+            const newInfoEl = document.getElementById('signup-new-sn-info');
+            if (oldRangeEl) oldRangeEl.textContent = `S.N. 1 से ${lastOfflineSn} तक`;
+            if (newRangeEl) newRangeEl.textContent = `S.N. ${lastOfflineSn + 1} से स्वतः`;
+            snInput.max = String(lastOfflineSn);
+            snInput.placeholder = `1 से ${lastOfflineSn} के बीच अपना पुराना S.N. लिखें`;
+            if (newInfoEl) {
+                newInfoEl.textContent = `एडमिन द्वारा वेरीफाई होने पर स्वतः अगला नया S.N. (अंतिम ऑफ़लाइन S.N. ${lastOfflineSn} + 1 यानी S.N. ${lastOfflineSn + 1} से शुरू — अगला उपलब्ध: S.N. ${getNextAvailableNewSn()}) अलॉट होगा।`;
+            }
+            handleSignupMemberTypeChange();
+        }
+
+        function handleSignupMemberTypeChange() {
+            const { allowOldMemberSn } = getSnConfig();
+            const snInput = document.getElementById('signup-sn');
+            const oldWrap = document.getElementById('signup-old-sn-wrap');
+            const newInfo = document.getElementById('signup-new-sn-info');
+            const oldCard = document.getElementById('signup-type-old-card');
+            const newCard = document.getElementById('signup-type-new-card');
+            if (!snInput || !oldWrap || !newInfo) return;
+
+            if (!allowOldMemberSn) {
+                oldWrap.classList.add('hidden');
+                snInput.required = false;
+                return;
+            }
+
+            const selectedRadio = document.querySelector('input[name="signup-member-type"]:checked');
+            const isOld = selectedRadio && selectedRadio.value === 'old';
+
+            oldWrap.classList.toggle('hidden', !isOld);
+            newInfo.classList.toggle('hidden', isOld);
+            snInput.required = !!isOld;
+            if (!isOld) {
+                snInput.value = '';
+                const warn = document.getElementById('signup-sn-warning');
+                if (warn) warn.classList.add('hidden');
+            } else {
+                checkSignupSnLive();
+            }
+
+            if (oldCard && newCard) {
+                oldCard.className = isOld
+                    ? 'cursor-pointer rounded-xl border-2 border-[#1E3A8A] bg-white p-2.5 flex items-start gap-2 transition shadow-sm'
+                    : 'cursor-pointer rounded-xl border-2 border-slate-200 bg-white p-2.5 flex items-start gap-2 transition';
+                newCard.className = !isOld
+                    ? 'cursor-pointer rounded-xl border-2 border-emerald-600 bg-white p-2.5 flex items-start gap-2 transition shadow-sm'
+                    : 'cursor-pointer rounded-xl border-2 border-slate-200 bg-white p-2.5 flex items-start gap-2 transition';
+            }
+        }
+
+        function checkSignupSnLive() {
+            const snInput = document.getElementById('signup-sn');
+            const warn = document.getElementById('signup-sn-warning');
+            if (!snInput || !warn) return true;
+            const raw = (snInput.value || '').trim();
+            if (!raw) {
+                warn.classList.add('hidden');
+                warn.textContent = '';
+                return true;
+            }
+            const { lastOfflineSn } = getSnConfig();
+            const num = parseInt(raw, 10);
+            if (!/^\d+$/.test(raw) || !Number.isInteger(num) || num < 1 || num > lastOfflineSn) {
+                warn.textContent = `चेतावनी: पुराने सदस्य का S.N. केवल 1 से ${lastOfflineSn} के बीच होना चाहिए।`;
+                warn.classList.remove('hidden');
+                return false;
+            }
+            const conflict = findSnConflict(num);
+            if (conflict) {
+                const statusTxt = conflict.type === 'user' ? 'सत्यापित सदस्य' : 'लंबित आवेदन';
+                warn.textContent = `चेतावनी: S.N. ${num} पहले से ${statusTxt} (${conflict.record.name}) के नाम पर दर्ज है। डुप्लीकेट S.N. दर्ज नहीं किया जा सकता।`;
+                warn.classList.remove('hidden');
+                return false;
+            }
+            warn.classList.add('hidden');
+            warn.textContent = '';
+            return true;
         }
 
         function renderOfficeAddress() {
@@ -6535,6 +7317,7 @@
 
         function renderMembershipView() {
             renderOrgPaymentDetails();
+            renderSignupSnSection();
             const isOpen = !appData.membershipWindow || appData.membershipWindow.isOpen !== false;
             const closedBox = document.getElementById('membership-closed-box');
             const openBox = document.getElementById('membership-open-box');
