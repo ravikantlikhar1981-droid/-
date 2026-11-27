@@ -3,8 +3,8 @@
   "short_name": "कोस्टा समाज",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1E3A8A",
-  "theme_color": "#1E3A8A",
+  "background_color": "#FFF0DB",
+  "theme_color": "#FDBA74",
   "description": "नव युवक कोस्टा समाज समिति झांसी - संगठन प्रबंधन एवं डिजिटल पोर्टल",
   "icons": [
     {
