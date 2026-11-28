@@ -447,150 +447,110 @@
             }
         }
 
-        /* ==================== ROYAL BLACK & GOLD OPENING SPLASH SCREEN ==================== */
+        /* ==================== MINIMAL MATTE BLACK & RUNNING GOLD BORDER SPLASH ==================== */
         #royal-splash-overlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
             background-color: #050507;
-            color: #FFFFFF;
+            color: #FDE68A;
             overflow: hidden;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
             opacity: 1;
-            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.5s ease;
-        }
-        #royal-splash-overlay::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.14) 0%, rgba(20, 18, 16, 0.72) 42%, #050507 82%);
-            opacity: 0;
-            animation: royalAmbientIn 0.95s ease-out 0.08s forwards;
-            pointer-events: none;
+            transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.55s ease;
         }
         #royal-splash-overlay.splash-fade-out {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
-        .royal-splash-badge {
-            position: absolute;
-            top: max(28px, env(safe-area-inset-top) + 20px);
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-            white-space: nowrap;
-            padding: 6px 16px;
-            border-radius: 9999px;
-            background: rgba(250, 204, 21, 0.08);
-            border: 1px solid rgba(250, 204, 21, 0.42);
-            color: #FDE68A;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.1em;
-            box-shadow: 0 0 18px rgba(250, 204, 21, 0.14);
-            opacity: 0;
-            animation: royalBadgeFadeIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.18s forwards;
-        }
         .royal-logo-stage {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 3;
-            width: 224px;
-            height: 224px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .royal-gold-glow {
-            position: absolute;
-            inset: 10px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(250, 204, 21, 0.36) 0%, rgba(212, 175, 55, 0.16) 46%, transparent 74%);
-            filter: blur(13px);
-            opacity: 0;
-            transform: scale(0.55);
-            animation:
-                royalGlowExpand 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.06s forwards,
-                royalGlowPulse 2.6s ease-in-out 1.02s infinite;
-            pointer-events: none;
-        }
-        .royal-ring-outer-wrap {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transform: scale(0.62);
-            animation: royalRingBloom 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.12s forwards;
-            pointer-events: none;
-        }
-        .royal-ring-inner-wrap {
-            position: absolute;
-            inset: 19px;
-            width: calc(100% - 38px);
-            height: calc(100% - 38px);
-            opacity: 0;
-            transform: scale(0.68);
-            animation: royalRingBloom 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
-            pointer-events: none;
-        }
-        .royal-ring-outer {
-            width: 100%;
-            height: 100%;
-            animation: royalSpinCW 22s linear infinite;
-            pointer-events: none;
-        }
-        .royal-ring-inner {
-            width: 100%;
-            height: 100%;
-            animation: royalSpinCCW 15s linear infinite;
-            pointer-events: none;
-        }
-        .royal-logo-frame {
-            position: relative;
-            z-index: 4;
-            width: 136px;
-            height: 136px;
-            padding: 3.5px;
-            border-radius: 28px;
+            width: 148px;
+            height: 148px;
             opacity: 1;
-            transform: scale(1);
-            background: linear-gradient(135deg, #FEF08A 0%, #D4AF37 30%, #8A6112 52%, #FACC15 76%, #FFF8C9 100%);
-            box-shadow:
-                0 0 28px rgba(250, 204, 21, 0.30),
-                0 14px 32px rgba(0, 0, 0, 0.72),
-                inset 0 1px 2px rgba(255, 255, 255, 0.75);
-            overflow: hidden;
         }
-        .royal-logo-frame::after {
+        .royal-logo-halo {
+            position: absolute;
+            inset: -12px;
+            border-radius: 36px;
+            overflow: hidden;
+            filter: blur(18px);
+            opacity: 0.72;
+            pointer-events: none;
+        }
+        .royal-logo-halo::before {
             content: '';
             position: absolute;
-            top: -25%;
-            left: -80%;
-            width: 52%;
-            height: 150%;
-            background: linear-gradient(105deg, transparent 20%, rgba(255, 250, 220, 0.52) 50%, transparent 80%);
-            transform: skewX(-18deg);
-            animation: royalShimmer 2.1s ease-in-out 0.35s infinite;
+            top: 50%;
+            left: 50%;
+            width: 240px;
+            height: 240px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(217, 119, 6, 0.14) 0deg,
+                rgba(217, 119, 6, 0.14) 220deg,
+                rgba(245, 158, 11, 0.48) 290deg,
+                rgba(250, 204, 21, 0.78) 335deg,
+                rgba(255, 255, 255, 0.92) 354deg,
+                rgba(217, 119, 6, 0.14) 360deg
+            );
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: royalBorderRun 1.9s linear infinite;
+        }
+        .royal-logo-box {
+            position: relative;
+            z-index: 2;
+            width: 148px;
+            height: 148px;
+            border-radius: 28px;
+            padding: 3.5px;
+            overflow: hidden;
+            opacity: 1;
+            transform: scale(1);
+            box-shadow:
+                0 0 26px rgba(250, 204, 21, 0.22),
+                0 12px 30px rgba(0, 0, 0, 0.78);
+        }
+        .royal-logo-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 236px;
+            height: 236px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(212, 175, 55, 0.16) 0deg,
+                rgba(212, 175, 55, 0.16) 215deg,
+                #B45309 265deg,
+                #F59E0B 305deg,
+                #FACC15 332deg,
+                #FEF08A 347deg,
+                #FFFFFF 356deg,
+                rgba(212, 175, 55, 0.16) 360deg
+            );
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: royalBorderRun 1.9s linear infinite;
             pointer-events: none;
-            z-index: 5;
         }
         .royal-logo-inner {
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: 100%;
             border-radius: 24.5px;
             background: #FFFED2;
-            padding: 7px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: inset 0 0 0 1px rgba(180, 128, 22, 0.25);
         }
         .royal-logo-inner img {
             width: 100%;
@@ -600,228 +560,47 @@
             opacity: 1;
             transform: scale(1);
         }
-        .royal-splash-titles {
+        .royal-splash-tagline {
             position: absolute;
-            top: calc(50% + 120px);
+            top: calc(50% + 98px);
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
-            width: 100%;
-            max-width: 360px;
-            padding: 0 20px;
-            text-align: center;
-        }
-        .royal-title-main {
-            font-size: 21px;
+            white-space: nowrap;
+            font-size: 16.5px;
             font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: 0.015em;
-            line-height: 1.3;
-            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
-            opacity: 0;
-            animation: royalFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.24s forwards;
-        }
-        .royal-title-sub {
-            font-size: 15.5px;
-            font-weight: 800;
-            color: #FACC15;
-            margin-top: 3px;
-            letter-spacing: 0.03em;
-            text-shadow: 0 0 16px rgba(250, 204, 21, 0.28);
-            opacity: 0;
-            animation: royalFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.38s forwards;
-        }
-        .royal-reg-pill {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 5.5px 14px;
-            border-radius: 9999px;
-            background: rgba(20, 18, 16, 0.76);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(250, 204, 21, 0.48);
-            color: #FEF3C7;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(250, 204, 21, 0.18);
-            opacity: 0;
-            animation: royalFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.52s forwards;
-        }
-        .royal-splash-footer {
-            position: absolute;
-            bottom: max(24px, env(safe-area-inset-bottom) + 18px);
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-            width: calc(100% - 48px);
-            max-width: 260px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 9px;
-            opacity: 0;
-            animation: royalFooterFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.62s forwards;
-        }
-        .royal-motto {
-            font-size: 12px;
-            font-weight: 700;
             color: #FDE68A;
-            letter-spacing: 0.08em;
-            opacity: 0.92;
+            letter-spacing: 0.06em;
+            text-align: center;
+            text-shadow:
+                0 0 14px rgba(250, 204, 21, 0.42),
+                0 1px 6px rgba(245, 158, 11, 0.28);
+            opacity: 0;
+            animation: royalTaglineIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.22s forwards;
         }
-        .royal-progress-track {
-            width: 100%;
-            height: 3.5px;
-            border-radius: 9999px;
-            background: rgba(250, 204, 21, 0.16);
-            overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55);
+        @keyframes royalBorderRun {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        .royal-progress-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 9999px;
-            background: linear-gradient(90deg, #B47D18 0%, #FACC15 55%, #FEF08A 100%);
-            box-shadow: 0 0 10px rgba(250, 204, 21, 0.65);
-            animation: royalProgressLoad 2.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-        }
-        @media (max-height: 620px) {
-            .royal-logo-stage {
-                width: 196px;
-                height: 196px;
-            }
-            .royal-logo-frame {
-                width: 120px;
-                height: 120px;
-            }
-            .royal-splash-titles {
-                top: calc(50% + 102px);
-            }
-            .royal-title-main {
-                font-size: 18.5px;
-            }
-            .royal-title-sub {
-                font-size: 14px;
-            }
-        }
-        @keyframes royalAmbientIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes royalSpinCW {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        @keyframes royalSpinCCW {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
-        }
-        @keyframes royalGlowExpand {
-            from { opacity: 0; transform: scale(0.55); }
-            to { opacity: 0.92; transform: scale(1); }
-        }
-        @keyframes royalGlowPulse {
-            0%, 100% { transform: scale(0.96); opacity: 0.82; }
-            50% { transform: scale(1.08); opacity: 1; }
-        }
-        @keyframes royalRingBloom {
-            from { opacity: 0; transform: scale(0.62); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes royalShimmer {
-            0% { left: -80%; }
-            55%, 100% { left: 138%; }
-        }
-        @keyframes royalBadgeFadeIn {
-            from { opacity: 0; transform: translate(-50%, -8px); }
+        @keyframes royalTaglineIn {
+            from { opacity: 0; transform: translate(-50%, 8px); }
             to { opacity: 1; transform: translate(-50%, 0); }
-        }
-        @keyframes royalFooterFadeIn {
-            from { opacity: 0; transform: translate(-50%, 10px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
-        @keyframes royalFadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes royalProgressLoad {
-            0% { width: 0%; }
-            35% { width: 46%; }
-            75% { width: 84%; }
-            100% { width: 100%; }
         }
     </style>
 </head>
 <body class="min-h-screen flex justify-center sm:py-4 sm:px-3">
 
-    <!-- ==================== ROYAL BLACK & GOLD OPENING SPLASH SCREEN ==================== -->
+    <!-- ==================== MINIMAL MATTE BLACK OPENING SPLASH SCREEN ==================== -->
     <div id="royal-splash-overlay" role="dialog" aria-label="नव युवक कोस्टा समाज समिति स्वागत स्क्रीन" onclick="dismissRoyalSplash()">
-        <div class="royal-splash-badge">✦ आधिकारिक डिजिटल पोर्टल ✦</div>
-
         <div class="royal-logo-stage">
-            <div class="royal-gold-glow"></div>
-
-            <!-- Outer Rotating Golden Mandala Ring -->
-            <div class="royal-ring-outer-wrap" aria-hidden="true">
-                <svg class="royal-ring-outer" viewBox="0 0 220 220" fill="none">
-                    <defs>
-                        <linearGradient id="royalGoldRing1" x1="0" y1="0" x2="220" y2="220" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#FEF08A" stop-opacity="0.9"/>
-                            <stop offset="50%" stop-color="#D4AF37" stop-opacity="0.35"/>
-                            <stop offset="100%" stop-color="#FACC15" stop-opacity="0.85"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="110" cy="110" r="103" stroke="url(#royalGoldRing1)" stroke-width="1.2" stroke-dasharray="6 5"/>
-                    <circle cx="110" cy="110" r="95" stroke="#D4AF37" stroke-opacity="0.35" stroke-width="0.9"/>
-                    <g fill="#FACC15" fill-opacity="0.85">
-                        <circle cx="110" cy="7" r="2.4"/>
-                        <circle cx="110" cy="213" r="2.4"/>
-                        <circle cx="7" cy="110" r="2.4"/>
-                        <circle cx="213" cy="110" r="2.4"/>
-                        <circle cx="37" cy="37" r="1.8"/>
-                        <circle cx="183" cy="37" r="1.8"/>
-                        <circle cx="37" cy="183" r="1.8"/>
-                        <circle cx="183" cy="183" r="1.8"/>
-                    </g>
-                </svg>
-            </div>
-
-            <!-- Inner Counter-Rotating Thin Golden Ring -->
-            <div class="royal-ring-inner-wrap" aria-hidden="true">
-                <svg class="royal-ring-inner" viewBox="0 0 184 184" fill="none">
-                    <defs>
-                        <linearGradient id="royalGoldRing2" x1="184" y1="0" x2="0" y2="184" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#FACC15" stop-opacity="0.9"/>
-                            <stop offset="50%" stop-color="#926711" stop-opacity="0.22"/>
-                            <stop offset="100%" stop-color="#FEF08A" stop-opacity="0.9"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="92" cy="92" r="88" stroke="url(#royalGoldRing2)" stroke-width="1.4" stroke-dasharray="24 10 4 10"/>
-                    <circle cx="92" cy="92" r="82" stroke="#FDE68A" stroke-opacity="0.28" stroke-width="0.8"/>
-                </svg>
-            </div>
-
-            <!-- Metallic Gold Frame with Official Committee Logo (Always opacity: 1, scale: 1 at dead center) -->
-            <div class="royal-logo-frame">
+            <div class="royal-logo-halo" aria-hidden="true"></div>
+            <div class="royal-logo-box">
                 <div class="royal-logo-inner">
                     <img id="royal-splash-logo" decoding="sync" loading="eager" alt="नव युवक कोस्टा समाज समिति झांसी लोगो">
                 </div>
             </div>
         </div>
-
-        <div class="royal-splash-titles">
-            <h1 class="royal-title-main">नव युवक कोस्टा समाज समिति</h1>
-            <p class="royal-title-sub">झांसी (उत्तर प्रदेश)</p>
-            <div class="royal-reg-pill">रजिस्ट्रेशन संख्या : JHA/04043/2025-26</div>
-        </div>
-
-        <div class="royal-splash-footer">
-            <p class="royal-motto">एकता • संस्कार • समाज सेवा</p>
-            <div class="royal-progress-track">
-                <div class="royal-progress-fill"></div>
-            </div>
-        </div>
+        <p class="royal-splash-tagline">शिक्षा से उन्नति तक</p>
     </div>
 
     <!-- ==================== MOBILE-FIRST APP CONTAINER ==================== -->
@@ -7772,7 +7551,7 @@
             if (splashLogo && officialLogo && officialLogo.src) {
                 splashLogo.src = officialLogo.src;
             }
-            royalSplashTimer = setTimeout(dismissRoyalSplash, 2600);
+            royalSplashTimer = setTimeout(dismissRoyalSplash, 4600);
         }
 
         // ==================== INIT ====================
