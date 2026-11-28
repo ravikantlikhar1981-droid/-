@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                                     cacheMode = WebSettings.LOAD_NO_CACHE
                                 }
                                 clearCache(true)
-                                setBackgroundColor(android.graphics.Color.parseColor("#050507"))
+                                setBackgroundColor(android.graphics.Color.parseColor("#FFFFFF"))
                                 loadUrl("file:///android_asset/index.html")
                             }
                         }

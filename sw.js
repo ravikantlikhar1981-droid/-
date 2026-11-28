@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kosta-samaj-v8';
+const CACHE_NAME = 'kosta-samaj-v9';
 const urlsToCache = [
   '/',
   '/index.html',
